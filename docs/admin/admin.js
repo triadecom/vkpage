@@ -15,6 +15,7 @@ let token = storage.getItem(TOKEN_KEY) || '';
 let dirty = false;
 let editIndex = null; // null = новое сообщество
 let editorAvatar = '';
+let editorReachManual = false; // охват введён руками — автообновление его не трогает
 let lastFetchedUrl = '';
 let autoFetchTimer = null;
 let toastTimer = null;
@@ -286,7 +287,7 @@ $('#refresh-all').addEventListener('click', async () => {
       if (info.name) pub.name = info.name;
       if (info.avatar) pub.avatar = info.avatar;
       if (info.subscribers) pub.subscribers = info.subscribers;
-      if (info.reach) pub.reach = info.reach;
+      if (info.reach && !pub.reachManual) pub.reach = info.reach;
       done++;
     } catch {
       failed++;
@@ -409,6 +410,7 @@ function openEditor(index) {
     : data.publics[index];
 
   editorAvatar = pub.avatar || '';
+  editorReachManual = !!pub.reachManual;
   lastFetchedUrl = pub.url || '';
   setVkStatus(VK_HINT);
   $('#editor-title').textContent = index === null ? 'Новое сообщество' : 'Редактирование';
@@ -437,12 +439,17 @@ $('#e-name').addEventListener('input', () => {
   if (!editorAvatar) updateAvatarPreview();
 });
 
+// ручной ввод охвата фиксируем; пустое поле возвращает автообновление
+$('#e-reach').addEventListener('input', () => {
+  editorReachManual = $('#e-reach').value.trim() !== '';
+});
+
 function fillEditorFromInfo(info, url) {
   lastFetchedUrl = url;
   if (info.avatar) editorAvatar = info.avatar;
   if (info.name) $('#e-name').value = info.name;
   if (info.subscribers) $('#e-subscribers').value = info.subscribers;
-  if (info.reach) $('#e-reach').value = info.reach;
+  if (info.reach && !editorReachManual) $('#e-reach').value = info.reach;
   updateAvatarPreview();
   setVkStatus('Данные из ВК загружены ✓');
 }
@@ -566,6 +573,7 @@ $('#editor').addEventListener('submit', (e) => {
     })
     .filter((p) => p.format);
 
+  const reach = Number($('#e-reach').value) || 0;
   const pub = {
     id: editIndex === null ? 'p' + Date.now() : data.publics[editIndex].id,
     name,
@@ -573,7 +581,8 @@ $('#editor').addEventListener('submit', (e) => {
     url,
     category: $('#e-category').value.trim(),
     subscribers: Number($('#e-subscribers').value) || 0,
-    reach: Number($('#e-reach').value) || 0,
+    reach,
+    reachManual: editorReachManual && reach > 0,
     note: $('#e-note').value.trim(),
     prices,
   };

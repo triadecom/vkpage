@@ -18,7 +18,8 @@ const AVATARS_DIR = path.join(DOCS_DIR, 'avatars');
       const info = await fetchVkInfo(pub.url, AVATARS_DIR);
       if (!pub.name && info.name) { pub.name = info.name; changed = true; }
       if (info.subscribers && info.subscribers !== pub.subscribers) { pub.subscribers = info.subscribers; changed = true; }
-      if (info.reach && info.reach !== pub.reach) { pub.reach = info.reach; changed = true; }
+      // охват, выставленный вручную в админке, не трогаем
+      if (info.reach && !pub.reachManual && info.reach !== pub.reach) { pub.reach = info.reach; changed = true; }
       if (info.avatar && info.avatar !== pub.avatar) { pub.avatar = info.avatar; changed = true; }
       console.log(`ok: ${pub.url} — подписчики ${info.subscribers}, охват ${info.reach}`);
     } catch (err) {

@@ -233,7 +233,8 @@ async function pollVkData() {
       const info = updates.get(pub.id);
       if (!info) continue;
       if (info.subscribers && info.subscribers !== pub.subscribers) { pub.subscribers = info.subscribers; changed = true; }
-      if (info.reach && info.reach !== pub.reach) { pub.reach = info.reach; changed = true; }
+      // охват, выставленный вручную в админке, не трогаем
+      if (info.reach && !pub.reachManual && info.reach !== pub.reach) { pub.reach = info.reach; changed = true; }
       if (info.avatar && info.avatar !== pub.avatar) { pub.avatar = info.avatar; changed = true; }
     }
     if (changed) {
