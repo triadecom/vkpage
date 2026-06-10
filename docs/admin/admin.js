@@ -158,6 +158,8 @@ const settingsFields = [
   ['s-contactVk', 'contactVk'],
   ['s-contactTg', 'contactTg'],
   ['s-message', 'messageTemplate'],
+  ['s-offer', 'offerUrl'],
+  ['s-requisites', 'requisites'],
 ];
 
 function renderSettings() {

@@ -174,6 +174,15 @@ function render(data) {
     $('#publics').innerHTML = '<div class="empty">Прайс заполняется — загляните чуть позже.</div>';
   }
 
+  const offerUrl = (settings.offerUrl || '').trim();
+  const requisites = (settings.requisites || '').trim();
+  $('#footer-legal').hidden = !offerUrl && !requisites;
+  $('#offer-link').hidden = !offerUrl;
+  if (offerUrl) $('#offer-link').href = offerUrl;
+  $('#requisites-link').hidden = !requisites;
+  $('#legal-dot').hidden = !(offerUrl && requisites);
+  if (requisites) $('#req-content').innerHTML = renderRequisitesRows(requisites);
+
   const promos = (settings.promos || []).filter((p) => (p.title || '').trim() || (p.text || '').trim());
   if (promos.length) {
     $('#promos-section').hidden = false;
@@ -190,6 +199,42 @@ function render(data) {
     $('#conditions-section').hidden = true;
   }
 }
+
+// Реквизиты: «Подпись: значение» — строка с лейблом, без двоеточия — имя ИП
+function renderRequisitesRows(text) {
+  return text.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
+    const m = line.match(/^(.{1,40}?):\s*(.+)$/);
+    if (!m) return `<div class="req-name">${esc(line)}</div>`;
+    const value = m[2].trim();
+    const isEmail = /^\S+@\S+\.\S+$/.test(value);
+    const valueHtml = isEmail
+      ? `<a class="req-value" href="mailto:${esc(value)}">${esc(value)}</a>`
+      : `<span class="req-value" title="Нажмите, чтобы скопировать">${esc(value)}</span>`;
+    return `<div class="req-row"><span class="req-label">${esc(m[1])}</span>${valueHtml}</div>`;
+  }).join('');
+}
+
+function closeRequisites() {
+  $('#requisites-backdrop').hidden = true;
+}
+
+$('#requisites-link').addEventListener('click', () => {
+  $('#requisites-backdrop').hidden = false;
+});
+$('#req-close').addEventListener('click', closeRequisites);
+$('#requisites-backdrop').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeRequisites();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeRequisites();
+});
+$('#req-content').addEventListener('click', (e) => {
+  const value = e.target.closest('span.req-value');
+  if (!value || !navigator.clipboard) return;
+  navigator.clipboard.writeText(value.textContent)
+    .then(() => toast('Скопировано в буфер'))
+    .catch(() => {});
+});
 
 // ВК не умеет предзаполнять текст личного сообщения по ссылке,
 // поэтому при клике кладём готовое сообщение в буфер обмена

@@ -37,10 +37,28 @@
     </main>
 
     <footer>
-      <span>Прайс обновлён <span id="footer-updated">—</span></span>
-      <div class="footer-links" id="footer-contacts"></div>
+      <div class="footer-row">
+        <span>Прайс обновлён <span id="footer-updated">—</span></span>
+        <div class="footer-links" id="footer-contacts"></div>
+      </div>
+      <div class="footer-legal" id="footer-legal" hidden>
+        <a id="offer-link" href="#" target="_blank" rel="noopener" hidden>Оферта</a>
+        <span class="legal-dot" id="legal-dot" hidden>·</span>
+        <button type="button" id="requisites-link" class="legal-link" hidden>Реквизиты</button>
+      </div>
     </footer>
   </div>
+
+  <div id="requisites-backdrop" class="modal-backdrop" hidden>
+    <div class="modal requisites-modal" role="dialog" aria-modal="true" aria-labelledby="req-title">
+      <div class="req-head">
+        <h2 id="req-title">Реквизиты</h2>
+        <button type="button" id="req-close" class="icon-btn" title="Закрыть">✕</button>
+      </div>
+      <div id="req-content"></div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
   <script src="app.js"></script>
 </body>

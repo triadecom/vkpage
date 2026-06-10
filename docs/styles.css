@@ -499,15 +499,116 @@ a.public-name:hover { color: var(--accent-bright); }
 
 footer {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
   margin: 56px 0 40px;
   padding-top: 26px;
   border-top: 1px solid var(--border);
   color: var(--text-muted);
   font-size: 14px;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.footer-legal a,
+.legal-link {
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255, 255, 255, 0.25);
+  transition: color .15s ease;
+}
+
+.footer-legal a:hover,
+.legal-link:hover {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
+.legal-dot {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* ---------- Реквизиты ---------- */
+
+.requisites-modal {
+  max-width: 420px;
+}
+
+.req-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.req-head h2 {
+  font-size: 19px;
+  margin: 0;
+}
+
+.req-name {
+  font-family: 'Unbounded', 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+  padding: 16px 0 14px;
+}
+
+.req-row {
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+#req-content > .req-row:first-child {
+  border-top: none;
+  padding-top: 16px;
+}
+
+.req-label {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.req-value {
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  text-decoration: none;
+  cursor: copy;
+  transition: color .15s ease;
+}
+
+.req-value:hover {
+  color: var(--accent-bright);
+}
+
+a.req-value {
+  cursor: pointer;
 }
 
 .footer-links {
@@ -770,7 +871,7 @@ textarea { resize: vertical; }
   .row-2 { grid-template-columns: 1fr; gap: 0; }
   .card { --card-pad: 18px; }
   .card-stats { gap: 20px; }
-  footer { flex-direction: column; align-items: flex-start; }
+  .footer-row { flex-direction: column; align-items: flex-start; }
   .pub-row { flex-wrap: wrap; }
   .price-edit-row { grid-template-columns: 1fr 110px 36px; }
 }
