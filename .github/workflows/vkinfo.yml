@@ -1,0 +1,28 @@
+name: vkinfo
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Ссылка на сообщество ВК'
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: vkinfo
+  cancel-in-progress: false
+jobs:
+  vkinfo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Получить данные сообщества
+        env:
+          VK_URL: ${{ inputs.url }}
+        run: node scripts/vkinfo-file.js "$VK_URL"
+      - name: Закоммитить результат
+        run: |
+          git config user.name "vkpage-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "Данные сообщества из ВК" && git pull --rebase && git push)

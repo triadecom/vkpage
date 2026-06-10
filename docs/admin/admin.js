@@ -304,7 +304,7 @@ $('#refresh-all').addEventListener('click', async () => {
 /* ---------- Редактор сообщества ---------- */
 
 const VK_HINT = REMOTE
-  ? 'вставьте ссылку и сохраните — название и всё остальное подтянется само'
+  ? 'вставьте ссылку — название и цифры подтянутся (в облаке до минуты)'
   : 'вставьте ссылку на паблик — данные подтянутся сами';
 
 async function dispatchRefresh() {
@@ -417,6 +417,17 @@ $('#e-name').addEventListener('input', () => {
   if (!editorAvatar) updateAvatarPreview();
 });
 
+function fillEditorFromInfo(info, url) {
+  lastFetchedUrl = url;
+  if (info.avatar) editorAvatar = info.avatar;
+  if (info.name) $('#e-name').value = info.name;
+  if (info.subscribers) $('#e-subscribers').value = info.subscribers;
+  if (info.reach) $('#e-reach').value = info.reach;
+  updateAvatarPreview();
+  setVkStatus('Данные из ВК загружены ✓');
+}
+
+// Локальный режим: сервер сходит в ВК сам, мгновенно
 async function fetchFromVk() {
   const url = $('#e-url').value.trim();
   if (!url || url === lastFetchedUrl) return;
@@ -432,36 +443,91 @@ async function fetchFromVk() {
     }
     const info = await res.json();
     if (!res.ok) throw new Error(info.error || 'Не получилось получить данные');
-
-    lastFetchedUrl = url;
-    if (info.avatar) {
-      editorAvatar = info.avatar;
-      updateAvatarPreview();
-    }
-    if (info.name) {
-      $('#e-name').value = info.name;
-      updateAvatarPreview();
-    }
-    if (info.subscribers) {
-      $('#e-subscribers').value = info.subscribers;
-    }
-    if (info.reach) {
-      $('#e-reach').value = info.reach;
-    }
-    setVkStatus('Данные из ВК загружены ✓');
+    fillEditorFromInfo(info, url);
   } catch {
     setVkStatus('Не получилось загрузить — проверьте ссылку');
   }
 }
 
-// Автоподтягивание: вставил ссылку — данные приехали сами (только локально,
-// из браузера к ВК ходить нельзя — CORS; в облаке это делает GitHub Actions)
+/* Облачный режим: браузеру к ВК нельзя (CORS), поэтому данные добывает
+   workflow vkinfo — кладёт их в docs/vkinfo/<hash>.json, а редактор забирает */
+
+async function sha1hex16(str) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+}
+
+async function readVkInfoFile(hash) {
+  const res = await fetch(GH_API + '/contents/docs/vkinfo/' + hash + '.json?ref=main&ts=' + Date.now(), {
+    headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
+    cache: 'no-store',
+  });
+  if (!res.ok) return null;
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+let remoteFetchSeq = 0;
+
+async function remoteFetchFromVk() {
+  const url = $('#e-url').value.trim();
+  if (!url || url === lastFetchedUrl) return;
+  const seq = ++remoteFetchSeq;
+  const hash = await sha1hex16(url);
+
+  // недавний результат уже лежит в репозитории — заполняем мгновенно
+  const cached = await readVkInfoFile(hash);
+  if (cached && Date.now() - Date.parse(cached.fetchedAt) < 24 * 3600 * 1000) {
+    if (seq === remoteFetchSeq) fillEditorFromInfo(cached, url);
+    return;
+  }
+
+  setVkStatus('Запрашиваю данные из ВК — обычно до минуты…');
+  const res = await fetch(GH_API + '/actions/workflows/vkinfo.yml/dispatches', {
+    method: 'POST',
+    headers: ghHeaders(),
+    body: JSON.stringify({ ref: 'main', inputs: { url } }),
+  });
+  if (res.status === 401 || res.status === 403) return dropAuth('Токен не подошёл — войдите заново');
+  if (res.status !== 204) {
+    setVkStatus('Не получилось запустить загрузку — попробуйте ещё раз');
+    return;
+  }
+
+  const startedAt = Date.now();
+  const poll = setInterval(async () => {
+    if (seq !== remoteFetchSeq || $('#modal-backdrop').hidden) {
+      clearInterval(poll);
+      return;
+    }
+    if (Date.now() - startedAt > 3 * 60 * 1000) {
+      clearInterval(poll);
+      setVkStatus('ВК не ответил — попробуйте ещё раз или сохраните, облако дозаполнит');
+      return;
+    }
+    const info = await readVkInfoFile(hash);
+    if (info && Date.parse(info.fetchedAt) >= startedAt - 60 * 1000) {
+      clearInterval(poll);
+      fillEditorFromInfo(info, url);
+    }
+  }, 10000);
+}
+
+$('#fetch-vk').addEventListener('click', () => {
+  lastFetchedUrl = ''; // кнопка — явный запрос, перезагружаем даже для того же адреса
+  if (REMOTE) remoteFetchFromVk();
+  else fetchFromVk();
+});
+
+// Автоподтягивание: вставил ссылку — данные поехали сами
 $('#e-url').addEventListener('input', () => {
-  if (REMOTE) return;
   clearTimeout(autoFetchTimer);
   const url = $('#e-url').value.trim();
   if (!/(^|\/\/)(www\.|m\.)?vk\.com\/[\w.\-]+/i.test(url)) return;
-  autoFetchTimer = setTimeout(fetchFromVk, 700);
+  autoFetchTimer = setTimeout(() => (REMOTE ? remoteFetchFromVk() : fetchFromVk()), 700);
 });
 
 $('#add-price').addEventListener('click', () => addPriceRow());
