@@ -126,6 +126,26 @@
           "price": 0
         }
       ]
+    },
+    {
+      "id": "p1781089578153",
+      "name": "Купчино - Фрунзенский район | Подслушано",
+      "avatar": "/avatars/98aa4463b0cf5995.jpg",
+      "url": "https://vk.com/kupchinoask",
+      "category": "Новости",
+      "subscribers": 81699,
+      "reach": 1646,
+      "note": "Выход постов в любое время",
+      "prices": [
+        {
+          "format": "Пост 1/24",
+          "price": 2000
+        },
+        {
+          "format": "Реклама в стори",
+          "price": 500
+        }
+      ]
     }
   ]
 }
