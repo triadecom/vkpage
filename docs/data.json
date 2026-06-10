@@ -33,22 +33,19 @@
       "name": "Пушкин - Царское Село | Павловск",
       "avatar": "/avatars/6131bfdc1b132404.jpg",
       "url": "https://vk.com/pushkin_story",
-      "category": "Юмор",
+      "category": "Город",
       "subscribers": 82292,
       "reach": 1317,
+      "reachManual": false,
       "note": "Выход постов: с 10:00 до 22:00 по Москве.",
       "prices": [
         {
-          "format": "Пост 1/24",
-          "price": 1200
+          "format": "Пост 1/72",
+          "price": 2000
         },
         {
-          "format": "Закреп 2/48",
-          "price": 2400
-        },
-        {
-          "format": "Репост",
-          "price": 900
+          "format": "Закреп 24ч",
+          "price": 3000
         }
       ]
     },
@@ -60,19 +57,16 @@
       "category": "Кино",
       "subscribers": 81705,
       "reach": 1395,
+      "reachManual": false,
       "note": "",
       "prices": [
         {
-          "format": "Пост 1/24",
-          "price": 900
+          "format": "Пост 1/72",
+          "price": 1500
         },
         {
-          "format": "Закреп 2/48",
-          "price": 1800
-        },
-        {
-          "format": "Репост",
-          "price": 700
+          "format": "Закреп 24ч",
+          "price": 2250
         }
       ]
     },
@@ -81,22 +75,19 @@
       "name": "Славянка Онлайн",
       "avatar": "/avatars/9001bbb72b8b4e3e.jpg",
       "url": "https://vk.com/slavyanka_news",
-      "category": "Новости",
+      "category": "Город",
       "subscribers": 23061,
       "reach": 478,
-      "note": "Аудитория: 80% женщины 25–45.",
+      "reachManual": false,
+      "note": "",
       "prices": [
         {
-          "format": "Пост 1/24",
+          "format": "Пост 1/72",
           "price": 600
         },
         {
-          "format": "Закреп 2/48",
-          "price": 1100
-        },
-        {
-          "format": "Репост",
-          "price": 450
+          "format": "Закреп 24ч",
+          "price": 900
         }
       ]
     },
@@ -108,19 +99,289 @@
       "category": "Город",
       "subscribers": 335832,
       "reach": 422,
+      "reachManual": false,
       "note": "",
       "prices": [
         {
-          "format": "Пост 1/24",
-          "price": 400
+          "format": "Пост 1/72",
+          "price": 1000
         },
         {
-          "format": "Закреп 2/48",
+          "format": "Закреп 24ч",
+          "price": 1500
+        }
+      ]
+    },
+    {
+      "id": "p1781113957386",
+      "name": "Славянка | Подслушано",
+      "avatar": "/avatars/5488007a094cd583.jpg",
+      "url": "https://vk.com/slavyanka",
+      "category": "Город",
+      "subscribers": 59966,
+      "reach": 2303,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 2000
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 3000
+        }
+      ]
+    },
+    {
+      "id": "p1781114066301",
+      "name": "Подслушано Петергоф - Cтрельна - Ломоносов",
+      "avatar": "/avatars/ebb572182bb4fb7f.jpg",
+      "url": "https://vk.com/story_petergof",
+      "category": "",
+      "subscribers": 25955,
+      "reach": 438,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114128391",
+      "name": "Сестрорецк и Зеленогорск | Курортный район",
+      "avatar": "/avatars/dc5e3dfe1d24df15.jpg",
+      "url": "https://vk.com/story_sestroreck",
+      "category": "Город",
+      "subscribers": 6289,
+      "reach": 0,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 300
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 450
+        }
+      ]
+    },
+    {
+      "id": "p1781114181595",
+      "name": "Колпино | Колпинский район",
+      "avatar": "/avatars/e5404d854f7078f5.jpg",
+      "url": "https://vk.com/kolpinoask",
+      "category": "",
+      "subscribers": 45672,
+      "reach": 579,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114206806",
+      "name": "Шушары | Подслушано",
+      "avatar": "/avatars/4a3dd4e8e12dc7ad.jpg",
+      "url": "https://vk.com/shushary_story",
+      "category": "",
+      "subscribers": 29654,
+      "reach": 310,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114246758",
+      "name": "Гатчина | Гатчинский район",
+      "avatar": "/avatars/3b00ccbc7c3e10a2.jpg",
+      "url": "https://vk.com/gatchina_live",
+      "category": "Город",
+      "subscribers": 41910,
+      "reach": 720,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114287797",
+      "name": "ПЕТЕРБУРГ | ЮГ",
+      "avatar": "/avatars/87285b10dbd272ac.jpg",
+      "url": "https://vk.com/south_spb",
+      "category": "Город",
+      "subscribers": 21272,
+      "reach": 88,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 300
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 450
+        }
+      ]
+    },
+    {
+      "id": "p1781114315380",
+      "name": "Московский район - Санкт-Петербург | Подслушано",
+      "avatar": "/avatars/429c1e665d2756d4.jpg",
+      "url": "https://vk.com/districtmsk",
+      "category": "Юмор",
+      "subscribers": 32859,
+      "reach": 615,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
           "price": 700
         },
         {
-          "format": "Репост",
+          "format": "Закреп 24ч",
+          "price": 1050
+        }
+      ]
+    },
+    {
+      "id": "p1781114347066",
+      "name": "Подслушано Кингисепп",
+      "avatar": "/avatars/c6533dc1523b7585.jpg",
+      "url": "https://vk.com/story_kingisepp",
+      "category": "Город",
+      "subscribers": 19673,
+      "reach": 692,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114369984",
+      "name": "Мамочки | Пушкинский район",
+      "avatar": "/avatars/8d871de4b8f72157.jpg",
+      "url": "https://vk.com/pushkin_family",
+      "category": "Город",
+      "subscribers": 8404,
+      "reach": 122,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
           "price": 300
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 450
+        }
+      ]
+    },
+    {
+      "id": "p1781114430753",
+      "name": "Коммунар Онлайн",
+      "avatar": "/avatars/b6b3bdd5fd4d3fec.jpg",
+      "url": "https://vk.com/kommunar_online",
+      "category": "Город",
+      "subscribers": 11293,
+      "reach": 323,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 600
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 900
+        }
+      ]
+    },
+    {
+      "id": "p1781114457922",
+      "name": "Пулковское | Шушары",
+      "avatar": "/avatars/f4d4f254c20f1827.jpg",
+      "url": "https://vk.com/pulkovo_live",
+      "category": "Город",
+      "subscribers": 7939,
+      "reach": 104,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 300
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 450
+        }
+      ]
+    },
+    {
+      "id": "p1781114485330",
+      "name": "Город Кронштадт",
+      "avatar": "",
+      "url": "https://vk.com/kronshtadt_story",
+      "category": "Город",
+      "subscribers": 0,
+      "reach": 0,
+      "reachManual": false,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/72",
+          "price": 300
+        },
+        {
+          "format": "Закреп 24ч",
+          "price": 450
         }
       ]
     }
