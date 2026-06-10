@@ -73,7 +73,6 @@ function renderCard(pub, settings) {
   <article class="card public-card">
     <div class="card-cover">
       ${cover}
-      ${pub.category ? `<span class="chip cover-chip">${esc(pub.category)}</span>` : ''}
     </div>
     <div class="card-title">${name}</div>
     <div class="card-stats">
@@ -81,6 +80,11 @@ function renderCard(pub, settings) {
         <span class="stat-value">${fmt(pub.subscribers)}</span>
         <span class="stat-label">подписчиков</span>
       </div>
+      ${pub.category ? `
+      <div class="stat stat-right">
+        <span class="stat-value">${esc(pub.category)}</span>
+        <span class="stat-label">тематика</span>
+      </div>` : ''}
     </div>
     <div class="price-list">${prices}</div>
     ${pub.note ? `<p class="card-note">${esc(pub.note)}</p>` : ''}

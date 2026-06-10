@@ -298,10 +298,22 @@ a.public-name:hover { color: var(--accent-bright); }
 
 .card-stats {
   display: flex;
+  justify-content: space-between;
   gap: 28px;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: var(--radius-sm);
+}
+
+.stat-right {
+  text-align: right;
+  min-width: 0;
+}
+
+.stat-right .stat-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stat-value {
