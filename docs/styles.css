@@ -267,6 +267,11 @@ a { color: var(--accent-bright); }
   margin: -4px 0 16px;
 }
 
+.avatar-fetch .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .public-name {
   font-family: 'Unbounded', 'Inter', sans-serif;
   font-size: 17px;
