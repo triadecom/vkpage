@@ -33,7 +33,8 @@ function loadConfig() {
   try {
     return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
   } catch {
-    const config = { adminPassword: 'admin', pollMinutes: 360 };
+    // поллинг по умолчанию выключен — данные круглосуточно обновляет GitHub Actions
+    const config = { adminPassword: 'admin', pollMinutes: 0 };
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2) + '\n');
     return config;
   }
