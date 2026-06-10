@@ -365,27 +365,83 @@ a.public-name:hover { color: var(--accent-bright); }
 .promos {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 48px;
 }
 
 .promo-card {
-  text-align: center;
-  padding: 34px 30px;
+  padding: 6px 26px;
 }
 
-.promo-card h3 {
-  font-size: 22px;
-  margin: 0 0 18px;
+.promo-item {
+  padding: 20px 0;
 }
 
-.promo-text {
+.promo-item + .promo-item {
+  border-top: 1px solid var(--border);
+}
+
+.promo-item-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.promo-item-title {
+  font-weight: 600;
+  font-size: 16.5px;
+  line-height: 1.45;
+}
+
+.promo-price {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--accent-bright);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.promo-item-text {
+  margin: 8px 0 0;
   color: var(--text-muted);
-  white-space: pre-line;
-  line-height: 1.8;
-  font-size: 15.5px;
-  max-width: 720px;
-  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.promo-list {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px 28px;
+}
+
+.promo-list li {
+  display: flex;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.promo-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 8px;
+}
+
+.promo-extra {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.promo-extra::before {
+  content: '+ ';
+  color: var(--accent-bright);
+  font-weight: 700;
 }
 
 .promo-edit {

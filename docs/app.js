@@ -88,6 +88,55 @@ function renderCard(pub, settings) {
   </article>`;
 }
 
+// Разбирает свободный текст блока акций на структурные пункты:
+// абзац = пункт; первая строка — название (цена «...9800₽» в конце уходит вправо);
+// строки с «-» — список, с «+» — дополнение к пакету
+function parsePromoItems(text) {
+  return String(text || '')
+    .split(/\n\s*\n/)
+    .map((par) => par.trim())
+    .filter(Boolean)
+    .map((par) => {
+      const lines = par.split('\n').map((l) => l.trim()).filter(Boolean);
+      let title = (lines.shift() || '').replace(/^[\p{Extended_Pictographic}️\s]+/u, '');
+      let price = 0;
+      const priceMatch = title.match(/^(.*?)[\s:—–-]*(?:Стоимость\s*)?(\d[\d\s]{2,})\s*₽[\s.!]*$/u);
+      if (priceMatch) {
+        title = priceMatch[1].replace(/[\s:—–-]+$/u, '');
+        price = Number(priceMatch[2].replace(/\s/g, ''));
+      }
+      const bullets = [];
+      const extras = [];
+      const texts = [];
+      for (const line of lines) {
+        if (/^[-–•]\s*/.test(line)) bullets.push(line.replace(/^[-–•]\s*/, ''));
+        else if (/^\+\s*/.test(line)) extras.push(line.replace(/^\+\s*/, ''));
+        else texts.push(line);
+      }
+      return { title, price, bullets, extras, texts };
+    });
+}
+
+function renderPromoBlock(promo) {
+  const items = parsePromoItems(promo.text);
+  return `
+  <section class="promo-block">
+    ${promo.title ? `<h2 class="section-title">${esc(promo.title)}</h2>` : ''}
+    <div class="card promo-card">
+      ${items.map((item) => `
+      <div class="promo-item">
+        <div class="promo-item-head">
+          <span class="promo-item-title">${esc(item.title)}</span>
+          ${item.price ? `<span class="dots"></span><span class="promo-price">${fmt(item.price)} ₽</span>` : ''}
+        </div>
+        ${item.texts.map((t) => `<p class="promo-item-text">${esc(t)}</p>`).join('')}
+        ${item.bullets.length ? `<ul class="promo-list">${item.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+        ${item.extras.map((x) => `<p class="promo-extra">${esc(x)}</p>`).join('')}
+      </div>`).join('')}
+    </div>
+  </section>`;
+}
+
 function render(data) {
   const { settings } = data;
   const publics = settings.sort === 'subscribers'
@@ -128,11 +177,7 @@ function render(data) {
   const promos = (settings.promos || []).filter((p) => (p.title || '').trim() || (p.text || '').trim());
   if (promos.length) {
     $('#promos-section').hidden = false;
-    $('#promos').innerHTML = promos.map((p) => `
-      <div class="card promo-card">
-        ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
-        <div class="promo-text">${esc(p.text)}</div>
-      </div>`).join('');
+    $('#promos').innerHTML = promos.map(renderPromoBlock).join('');
   } else {
     $('#promos-section').hidden = true;
   }

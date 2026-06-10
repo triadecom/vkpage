@@ -207,7 +207,7 @@ function renderPromos() {
         <button type="button" class="icon-btn" title="Ниже" ${i === promos.length - 1 ? 'disabled' : ''}>↓</button>
         <button type="button" class="icon-btn danger" title="Удалить">✕</button>
       </div>
-      <textarea rows="7" placeholder="Текст блока: акции, пакеты, цены. Пустая строка — отступ между абзацами."></textarea>`;
+      <textarea rows="7" placeholder="Каждый абзац — отдельный пункт. Первая строка — название, цена в её конце (например «: 9800₽») встанет справа. Строки с «-» станут списком, с «+» — дополнением."></textarea>`;
     block.querySelector('input').value = promo.title || '';
     block.querySelector('textarea').value = promo.text || '';
     block.querySelector('input').addEventListener('input', (e) => { promo.title = e.target.value; markDirty(); });
