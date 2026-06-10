@@ -357,18 +357,38 @@ function setVkStatus(text) {
   $('#vk-status').textContent = text;
 }
 
-function updateAvatarPreview() {
+async function updateAvatarPreview() {
   const img = $('#e-avatar');
   const placeholder = $('#e-avatar-placeholder');
-  if (editorAvatar) {
-    img.src = avatarSrc(editorAvatar);
-    img.hidden = false;
-    placeholder.hidden = true;
-  } else {
+  if (!editorAvatar) {
     img.hidden = true;
     placeholder.hidden = false;
     placeholder.textContent = ($('#e-name').value.trim().charAt(0) || '?').toUpperCase();
+    return;
   }
+  img.hidden = false;
+  placeholder.hidden = true;
+  if (!REMOTE) {
+    img.src = avatarSrc(editorAvatar);
+    return;
+  }
+  // в облаке свежая аватарка появляется на сайте только после пересборки Pages,
+  // поэтому превью берём напрямую из репозитория через API
+  const current = editorAvatar;
+  try {
+    const res = await fetch(GH_API + '/contents/docs/' + current.replace(/^\//, '') + '?ref=main&ts=' + Date.now(), {
+      headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
+      cache: 'no-store',
+    });
+    if (current !== editorAvatar) return; // пока грузили, выбрали другую
+    if (res.ok) {
+      img.src = URL.createObjectURL(await res.blob());
+      return;
+    }
+  } catch {
+    // сеть мигнула — покажем через сайт
+  }
+  if (current === editorAvatar) img.src = avatarSrc(current);
 }
 
 function addPriceRow(format = '', price = '') {
