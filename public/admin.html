@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Админка · Прайс на рекламу</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Crect%20width='100'%20height='100'%20rx='22'%20fill='%232787f5'/%3E%3Ctext%20x='50'%20y='70'%20font-size='52'%20text-anchor='middle'%20fill='white'%20font-family='Arial'%20font-weight='bold'%3E%E2%82%BD%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="admin">
+  <div class="page">
+    <section id="login" class="login-screen" hidden>
+      <form id="login-form" class="card login-card">
+        <h2>Вход в админку</h2>
+        <p class="muted">Пароль лежит в файле config.json рядом с сервером.</p>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input type="password" id="password" autocomplete="current-password" autofocus>
+        </div>
+        <div id="login-error" class="error"></div>
+        <button class="btn btn-primary" type="submit">Войти</button>
+      </form>
+    </section>
+
+    <div id="app" hidden>
+      <div class="topbar">
+        <span class="topbar-title">Управление прайсом</span>
+        <a class="btn btn-ghost btn-small" href="/" target="_blank" rel="noopener">Открыть страницу ↗</a>
+        <span class="flex-spacer"></span>
+        <button id="save" class="btn btn-primary btn-small" disabled>Сохранить изменения</button>
+        <button id="publish" class="btn btn-ghost btn-small">Опубликовать</button>
+        <button id="logout" class="btn btn-ghost btn-small">Выйти</button>
+      </div>
+
+      <section class="card admin-section">
+        <h2>Настройки страницы</h2>
+        <div class="field">
+          <label for="s-title">Заголовок</label>
+          <input type="text" id="s-title">
+        </div>
+        <div class="field">
+          <label for="s-subtitle">Подзаголовок</label>
+          <textarea id="s-subtitle" rows="2"></textarea>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="s-contactVk">Ссылка ВКонтакте — куда писать</label>
+            <input type="url" id="s-contactVk" placeholder="https://vk.com/...">
+          </div>
+          <div class="field">
+            <label for="s-contactTg">Ссылка Telegram — необязательно</label>
+            <input type="url" id="s-contactTg" placeholder="https://t.me/...">
+          </div>
+        </div>
+        <div class="field">
+          <label for="s-sort">Порядок сообществ на странице</label>
+          <select id="s-sort">
+            <option value="manual">Вручную — стрелками в списке ниже</option>
+            <option value="subscribers">Автосортировка по подписчикам — сначала крупные</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="s-message">Шаблон сообщения рекламодателю — копируется при клике «Заказать размещение», {название} заменится на имя паблика</label>
+          <textarea id="s-message" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="s-conditions">Условия размещения — по одному на строку</label>
+          <textarea id="s-conditions" rows="6"></textarea>
+        </div>
+      </section>
+
+      <section class="card admin-section">
+        <div class="section-head">
+          <h2>Сообщества</h2>
+          <div class="section-head-actions">
+            <button id="refresh-all" class="btn btn-ghost btn-small">⟳ Обновить всё из ВК</button>
+            <button id="add-public" class="btn btn-primary btn-small">+ Добавить</button>
+          </div>
+        </div>
+        <div id="publics-list"></div>
+      </section>
+    </div>
+  </div>
+
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <form id="editor" class="modal">
+      <h2 id="editor-title">Сообщество</h2>
+      <div class="field">
+        <label for="e-name">Название *</label>
+        <input type="text" id="e-name" required>
+      </div>
+      <div class="field">
+        <label for="e-url">Ссылка на сообщество</label>
+        <input type="url" id="e-url" placeholder="https://vk.com/...">
+      </div>
+      <div class="avatar-fetch">
+        <img id="e-avatar" class="avatar" alt="" hidden>
+        <span id="e-avatar-placeholder" class="avatar avatar-placeholder">?</span>
+        <span id="vk-status" class="muted" style="font-size: 12.5px;"></span>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="e-category">Тематика</label>
+          <input type="text" id="e-category" placeholder="Юмор">
+        </div>
+        <div class="field">
+          <label for="e-subscribers">Подписчики</label>
+          <input type="number" id="e-subscribers" min="0" placeholder="100000">
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="e-reach">Средний охват поста</label>
+          <input type="number" id="e-reach" min="0" placeholder="15000">
+        </div>
+        <div class="field">
+          <label for="e-note">Примечание</label>
+          <input type="text" id="e-note" placeholder="Выход постов 10:00–22:00">
+        </div>
+      </div>
+      <span class="field-label-row">Форматы и цены</span>
+      <div id="price-rows"></div>
+      <button type="button" id="add-price" class="btn btn-ghost btn-small">+ Формат</button>
+      <div class="modal-actions">
+        <button type="button" id="editor-cancel" class="btn btn-ghost">Отмена</button>
+        <button type="submit" class="btn btn-primary">Готово</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/admin.js"></script>
+</body>
+</html>
