@@ -782,6 +782,41 @@ textarea { resize: vertical; }
   background: rgba(5, 8, 12, 0.72);
 }
 
+.modal-backdrop.centered {
+  align-items: center;
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.modal-backdrop:not([hidden]) {
+  animation: backdrop-in .2s ease both;
+}
+
+.modal-backdrop:not([hidden]) .modal {
+  animation: modal-in .3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-backdrop:not([hidden]),
+  .modal-backdrop:not([hidden]) .modal {
+    animation: none;
+  }
+}
+
 .modal {
   width: 100%;
   max-width: 580px;
