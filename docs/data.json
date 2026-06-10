@@ -110,6 +110,22 @@
           "price": 300
         }
       ]
+    },
+    {
+      "id": "p999",
+      "name": "",
+      "avatar": "",
+      "url": "https://vk.com/south_spb",
+      "category": "",
+      "subscribers": 0,
+      "reach": 0,
+      "note": "",
+      "prices": [
+        {
+          "format": "Пост 1/24",
+          "price": 0
+        }
+      ]
     }
   ]
 }
