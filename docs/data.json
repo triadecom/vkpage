@@ -123,30 +123,6 @@
           "price": 300
         }
       ]
-    },
-    {
-      "id": "p1781089948693",
-      "name": "Наше Рыбацкое",
-      "avatar": "/avatars/d301c8ff5a3e75db.jpg",
-      "url": "https://vk.com/nashe_rybatskoe",
-      "category": "Новости",
-      "subscribers": 14756,
-      "reach": 1561,
-      "note": "Выход поста в любое время",
-      "prices": [
-        {
-          "format": "Пост 1/24",
-          "price": 2000
-        },
-        {
-          "format": "Сториз",
-          "price": 500
-        },
-        {
-          "format": "Пост 2/28",
-          "price": 1488
-        }
-      ]
     }
   ]
 }
