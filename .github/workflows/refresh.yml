@@ -1,0 +1,26 @@
+name: refresh
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Обновить данные из ВК
+        run: node scripts/refresh.js
+      - name: Закоммитить изменения
+        run: |
+          git config user.name "vkpage-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "Автообновление данных из ВК" && git push)
