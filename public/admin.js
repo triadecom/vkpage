@@ -251,14 +251,12 @@ $('#refresh-all').addEventListener('click', async () => {
     // в облаке обновлением занимается GitHub Actions
     button.disabled = true;
     try {
-      const res = await fetch(GH_API + '/actions/workflows/refresh.yml/dispatches', {
-        method: 'POST',
-        headers: ghHeaders(),
-        body: JSON.stringify({ ref: 'main' }),
-      });
-      if (res.status === 401 || res.status === 403) return dropAuth('Токен не подошёл — войдите заново');
-      if (res.status === 204) toast('Обновление запущено в облаке — через 2–3 минуты перезагрузите админку');
-      else toast('Не получилось запустить обновление');
+      if (await dispatchRefresh()) {
+        toast('Обновление запущено — результат появится здесь через 2–3 минуты');
+        watchForVkData();
+      } else if (token) {
+        toast('Не получилось запустить обновление');
+      }
     } finally {
       button.disabled = false;
     }
@@ -306,8 +304,54 @@ $('#refresh-all').addEventListener('click', async () => {
 /* ---------- Редактор сообщества ---------- */
 
 const VK_HINT = REMOTE
-  ? 'вставьте ссылку — данные подтянутся облаком после «Обновить всё из ВК»'
+  ? 'вставьте ссылку и сохраните — название и всё остальное подтянется само'
   : 'вставьте ссылку на паблик — данные подтянутся сами';
+
+async function dispatchRefresh() {
+  const res = await fetch(GH_API + '/actions/workflows/refresh.yml/dispatches', {
+    method: 'POST',
+    headers: ghHeaders(),
+    body: JSON.stringify({ ref: 'main' }),
+  });
+  if (res.status === 401 || res.status === 403) {
+    dropAuth('Токен не подошёл — войдите заново');
+    return false;
+  }
+  return res.status === 204;
+}
+
+// После облачного сохранения ждём, пока Actions заполнит данные из ВК,
+// и сами показываем результат — без перезагрузок и кнопок
+let watchTimer = null;
+function watchForVkData() {
+  clearInterval(watchTimer);
+  let tries = 0;
+  watchTimer = setInterval(async () => {
+    if (++tries > 15) {
+      clearInterval(watchTimer);
+      return;
+    }
+    try {
+      const res = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
+        headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
+        cache: 'no-store',
+      });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      const stillWaiting = fresh.publics.some((p) => p.url && (!p.name || !p.subscribers));
+      if (!stillWaiting) {
+        clearInterval(watchTimer);
+        if (!dirty) {
+          data = fresh;
+          renderPublics();
+          toast('Данные из ВК подтянулись ✓');
+        }
+      }
+    } catch {
+      // временная ошибка сети — попробуем в следующий тик
+    }
+  }, 20000);
+}
 
 function setVkStatus(text) {
   $('#vk-status').textContent = text;
@@ -490,7 +534,14 @@ $('#save').addEventListener('click', async () => {
     if (result === 'auth') return dropAuth('Токен не подошёл — войдите заново');
     if (result === 'ok') {
       markSaved();
-      toast('Сохранено — сайт обновится через минуту-две');
+      // у новых пабликов есть ссылка, но нет данных — облако заполнит их само
+      const needsVk = data.publics.some((p) => p.url && (!p.name || !p.avatar || !p.subscribers));
+      if (needsVk && await dispatchRefresh()) {
+        toast('Сохранено — название и цифры подтянутся из ВК через пару минут');
+        watchForVkData();
+      } else {
+        toast('Сохранено — сайт обновится через минуту-две');
+      }
     } else if (result === 'conflict') {
       toast('Конфликт версий — перезагрузите админку и повторите');
     } else {

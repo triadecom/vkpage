@@ -58,9 +58,10 @@ function renderCard(pub, settings) {
       <span class="price-value">${fmt(p.price)} ₽</span>
     </div>`).join('');
 
+  const displayName = pub.name || (pub.url ? pub.url.replace(/^https?:\/\//, '') : 'Сообщество ВК');
   const name = pub.url
-    ? `<a class="public-name" href="${esc(pub.url)}" target="_blank" rel="noopener">${esc(pub.name)}</a>`
-    : `<span class="public-name">${esc(pub.name)}</span>`;
+    ? `<a class="public-name" href="${esc(pub.url)}" target="_blank" rel="noopener">${esc(displayName)}</a>`
+    : `<span class="public-name">${esc(displayName)}</span>`;
 
   const initial = String(pub.name || '?').trim().charAt(0).toUpperCase() || '?';
   // путь относительный, чтобы работало и локально, и на GitHub Pages в поддиректории
