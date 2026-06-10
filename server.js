@@ -25,6 +25,7 @@ const MIME = {
   '.gif': 'image/gif',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
+  '.pdf': 'application/pdf',
 };
 
 const sessions = new Set();
@@ -177,17 +178,22 @@ function serveStatic(res, pathname) {
     fs.createReadStream(DATA_FILE).pipe(res);
     return;
   }
-  // аватарки канонически лежат в docs/avatars
-  const root = pathname.startsWith('/avatars/') ? DOCS_DIR : PUBLIC_DIR;
-  const filePath = path.normalize(path.join(root, pathname));
-  if (filePath !== root && !filePath.startsWith(root + path.sep)) {
-    return sendJson(res, 403, { error: 'Запрещено' });
-  }
-  fs.stat(filePath, (err, stat) => {
-    if (err || !stat.isFile()) return sendJson(res, 404, { error: 'Не найдено' });
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });
-    fs.createReadStream(filePath).pipe(res);
-  });
+  // аватарки и файлы вроде оферты канонически лежат в docs/ — ищем сначала в public/, потом там
+  const tryServe = (root, fallback) => {
+    const filePath = path.normalize(path.join(root, pathname));
+    if (filePath !== root && !filePath.startsWith(root + path.sep)) {
+      return sendJson(res, 403, { error: 'Запрещено' });
+    }
+    fs.stat(filePath, (err, stat) => {
+      if (err || !stat.isFile()) {
+        if (fallback) return tryServe(fallback, null);
+        return sendJson(res, 404, { error: 'Не найдено' });
+      }
+      res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream' });
+      fs.createReadStream(filePath).pipe(res);
+    });
+  };
+  tryServe(PUBLIC_DIR, DOCS_DIR);
 }
 
 const server = http.createServer(async (req, res) => {
