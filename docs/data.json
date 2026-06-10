@@ -22,7 +22,7 @@
       "url": "https://vk.com/pushkin_story",
       "category": "Юмор",
       "subscribers": 82288,
-      "reach": 2519,
+      "reach": 2542,
       "note": "Выход постов: с 10:00 до 22:00 по Москве.",
       "prices": [
         {
@@ -46,7 +46,7 @@
       "url": "https://vk.com/kupchinoask",
       "category": "Кино",
       "subscribers": 81699,
-      "reach": 1624,
+      "reach": 1634,
       "note": "",
       "prices": [
         {
@@ -70,7 +70,7 @@
       "url": "https://vk.com/slavyanka_news",
       "category": "Новости",
       "subscribers": 23061,
-      "reach": 430,
+      "reach": 433,
       "note": "Аудитория: 80% женщины 25–45.",
       "prices": [
         {
@@ -94,7 +94,7 @@
       "url": "https://vk.com/spb_pn",
       "category": "Город",
       "subscribers": 335832,
-      "reach": 432,
+      "reach": 435,
       "note": "",
       "prices": [
         {
@@ -113,12 +113,12 @@
     },
     {
       "id": "p999",
-      "name": "",
-      "avatar": "",
+      "name": "ПЕТЕРБУРГ | ЮГ",
+      "avatar": "/avatars/87285b10dbd272ac.jpg",
       "url": "https://vk.com/south_spb",
       "category": "",
-      "subscribers": 0,
-      "reach": 0,
+      "subscribers": 21272,
+      "reach": 121,
       "note": "",
       "prices": [
         {
