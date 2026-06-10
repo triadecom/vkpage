@@ -367,16 +367,19 @@ a.public-name:hover { color: var(--accent-bright); }
   flex-direction: column;
 }
 
-.promo-card {
-  padding: 6px 26px;
+.promo-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .promo-item {
-  padding: 20px 0;
+  padding: 18px 22px;
+  transition: border-color .2s ease;
 }
 
-.promo-item + .promo-item {
-  border-top: 1px solid var(--border);
+.promo-item:hover {
+  border-color: rgba(77, 158, 255, 0.3);
 }
 
 .promo-item-head {

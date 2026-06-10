@@ -122,9 +122,9 @@ function renderPromoBlock(promo) {
   return `
   <section class="promo-block">
     ${promo.title ? `<h2 class="section-title">${esc(promo.title)}</h2>` : ''}
-    <div class="card promo-card">
+    <div class="promo-items">
       ${items.map((item) => `
-      <div class="promo-item">
+      <div class="card promo-item">
         <div class="promo-item-head">
           <span class="promo-item-title">${esc(item.title)}</span>
           ${item.price ? `<span class="dots"></span><span class="promo-price">${fmt(item.price)} ₽</span>` : ''}
