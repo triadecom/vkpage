@@ -124,6 +124,12 @@ $('#login-form').addEventListener('submit', async (e) => {
       storage.setItem(TOKEN_KEY, token);
       $('#login-error').textContent = '';
       $('#password').value = '';
+      // перезагружаем данные уже с токеном — свежие и без анонимных лимитов
+      try {
+        data = await loadData();
+      } catch {
+        // оставляем то, что загрузилось при старте
+      }
       showApp();
     } else {
       $('#login-error').textContent = 'Токен не подошёл — нужны права записи в ' + GH_REPO;
@@ -773,14 +779,40 @@ window.addEventListener('beforeunload', (e) => {
 
 /* ---------- Старт ---------- */
 
+async function loadData() {
+  if (!REMOTE) {
+    return (await fetch('/api/data')).json();
+  }
+  // основной источник — GitHub API (всегда свежий); у анонимных запросов
+  // жёсткий лимит на IP, поэтому при неудаче берём копию с самого сайта
+  try {
+    const res = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
+      headers: {
+        'Accept': 'application/vnd.github.raw+json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+      },
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const parsed = await res.json();
+      if (parsed && parsed.settings) return parsed;
+    }
+  } catch {
+    // сеть или лимит — переходим на запасной источник
+  }
+  const res = await fetch('../data.json?ts=' + Date.now(), { cache: 'no-store' });
+  const parsed = await res.json();
+  if (!parsed || !parsed.settings) throw new Error('данные не читаются');
+  return parsed;
+}
+
 (async function init() {
-  const res = REMOTE
-    ? await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
-        headers: { 'Accept': 'application/vnd.github.raw+json' },
-        cache: 'no-store',
-      })
-    : await fetch('/api/data');
-  data = await res.json();
+  try {
+    data = await loadData();
+  } catch {
+    document.body.innerHTML = '<div class="login-screen"><div class="card login-card"><h2>Не удалось загрузить данные</h2><p class="muted">Проверьте интернет и перезагрузите страницу (Cmd+Shift+R).</p></div></div>';
+    return;
+  }
   if (token) showApp();
   else showLogin();
 })();
