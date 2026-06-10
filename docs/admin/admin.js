@@ -101,6 +101,7 @@ function showApp() {
   $('#app').hidden = false;
   $('#publish').hidden = REMOTE; // в облаке сохранение само публикует
   renderSettings();
+  renderPromos();
   renderPublics();
 }
 
@@ -184,6 +185,58 @@ for (const [id, key] of settingsFields) {
 $('#s-conditions').addEventListener('input', (e) => {
   data.settings.conditions = e.target.value.split('\n').map((l) => l.trim()).filter(Boolean);
   markDirty();
+});
+
+/* ---------- Акции и пакеты ---------- */
+
+function renderPromos() {
+  const wrap = $('#promos-list');
+  const promos = data.settings.promos || (data.settings.promos = []);
+  if (!promos.length) {
+    wrap.innerHTML = '<div class="empty">Блоков нет — добавьте, когда появятся акции или пакеты.</div>';
+    return;
+  }
+  wrap.innerHTML = '';
+  promos.forEach((promo, i) => {
+    const block = document.createElement('div');
+    block.className = 'promo-edit';
+    block.innerHTML = `
+      <div class="promo-edit-head">
+        <input type="text" placeholder="Заголовок — например, «Скидки и пакеты»">
+        <button type="button" class="icon-btn" title="Выше" ${i === 0 ? 'disabled' : ''}>↑</button>
+        <button type="button" class="icon-btn" title="Ниже" ${i === promos.length - 1 ? 'disabled' : ''}>↓</button>
+        <button type="button" class="icon-btn danger" title="Удалить">✕</button>
+      </div>
+      <textarea rows="7" placeholder="Текст блока: акции, пакеты, цены. Пустая строка — отступ между абзацами."></textarea>`;
+    block.querySelector('input').value = promo.title || '';
+    block.querySelector('textarea').value = promo.text || '';
+    block.querySelector('input').addEventListener('input', (e) => { promo.title = e.target.value; markDirty(); });
+    block.querySelector('textarea').addEventListener('input', (e) => { promo.text = e.target.value; markDirty(); });
+    const [up, down, del] = block.querySelectorAll('.icon-btn');
+    up.addEventListener('click', () => {
+      [promos[i - 1], promos[i]] = [promos[i], promos[i - 1]];
+      markDirty();
+      renderPromos();
+    });
+    down.addEventListener('click', () => {
+      [promos[i + 1], promos[i]] = [promos[i], promos[i + 1]];
+      markDirty();
+      renderPromos();
+    });
+    del.addEventListener('click', () => {
+      if (!confirm('Удалить блок «' + (promo.title || 'без названия') + '»?')) return;
+      promos.splice(i, 1);
+      markDirty();
+      renderPromos();
+    });
+    wrap.appendChild(block);
+  });
+}
+
+$('#add-promo').addEventListener('click', () => {
+  (data.settings.promos = data.settings.promos || []).push({ title: '', text: '' });
+  markDirty();
+  renderPromos();
 });
 
 /* ---------- Список сообществ ---------- */

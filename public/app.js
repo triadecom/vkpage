@@ -81,10 +81,6 @@ function renderCard(pub, settings) {
         <span class="stat-value">${fmt(pub.subscribers)}</span>
         <span class="stat-label">подписчиков</span>
       </div>
-      <div class="stat">
-        <span class="stat-value">${fmt(pub.reach)}</span>
-        <span class="stat-label">охват поста</span>
-      </div>
     </div>
     <div class="price-list">${prices}</div>
     ${pub.note ? `<p class="card-note">${esc(pub.note)}</p>` : ''}
@@ -127,6 +123,18 @@ function render(data) {
   } else {
     $('#stats').innerHTML = '';
     $('#publics').innerHTML = '<div class="empty">Прайс заполняется — загляните чуть позже.</div>';
+  }
+
+  const promos = (settings.promos || []).filter((p) => (p.title || '').trim() || (p.text || '').trim());
+  if (promos.length) {
+    $('#promos-section').hidden = false;
+    $('#promos').innerHTML = promos.map((p) => `
+      <div class="card promo-card">
+        ${p.title ? `<h3>${esc(p.title)}</h3>` : ''}
+        <div class="promo-text">${esc(p.text)}</div>
+      </div>`).join('');
+  } else {
+    $('#promos-section').hidden = true;
   }
 
   const conditions = (settings.conditions || []).filter(Boolean);

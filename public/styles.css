@@ -360,6 +360,50 @@ a.public-name:hover { color: var(--accent-bright); }
   border-radius: var(--radius);
 }
 
+/* ---------- Promos ---------- */
+
+.promos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 48px;
+}
+
+.promo-card {
+  text-align: center;
+  padding: 34px 30px;
+}
+
+.promo-card h3 {
+  font-size: 22px;
+  margin: 0 0 18px;
+}
+
+.promo-text {
+  color: var(--text-muted);
+  white-space: pre-line;
+  line-height: 1.8;
+  font-size: 15.5px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.promo-edit {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.promo-edit-head {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.promo-edit-head input { flex: 1; }
+
 /* ---------- Conditions ---------- */
 
 .section-title {
