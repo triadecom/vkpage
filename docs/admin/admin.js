@@ -58,6 +58,11 @@ function b64utf8(str) {
   return btoa(bin);
 }
 
+function fromB64utf8(b64) {
+  const bin = atob(String(b64).replace(/\n/g, ''));
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+}
+
 function toast(message) {
   const el = $('#toast');
   el.textContent = message;
@@ -654,14 +659,26 @@ $('#editor').addEventListener('submit', (e) => {
 
 async function saveRemote() {
   data.settings.updatedAt = new Date().toISOString().slice(0, 10);
-  const body = JSON.stringify(data, null, 2) + '\n';
 
   const getRes = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
     headers: ghHeaders(),
     cache: 'no-store',
   });
   if (getRes.status === 401 || getRes.status === 403) return 'auth';
-  const sha = getRes.ok ? (await getRes.json()).sha : undefined;
+  let sha;
+  if (getRes.ok) {
+    const file = await getRes.json();
+    sha = file.sha;
+    // сливаем со свежими настройками из репозитория: поля, о которых эта
+    // версия админки не знает, не должны затираться при сохранении
+    try {
+      const fresh = JSON.parse(fromB64utf8(file.content));
+      data.settings = { ...fresh.settings, ...data.settings };
+    } catch {
+      // не удалось разобрать — сохраняем как есть
+    }
+  }
+  const body = JSON.stringify(data, null, 2) + '\n';
 
   const putRes = await fetch(GH_API + '/contents/docs/data.json', {
     method: 'PUT',

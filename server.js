@@ -92,20 +92,7 @@ function run(cmd, args) {
   });
 }
 
-// Собирает статическую часть сайта в docs/ (данные и аватарки уже там).
-// Админка публикуется тоже — в облаке она работает через GitHub API.
-function buildDocs() {
-  fs.mkdirSync(path.join(DOCS_DIR, 'admin'), { recursive: true });
-  for (const f of ['index.html', 'styles.css', 'app.js']) {
-    fs.copyFileSync(path.join(PUBLIC_DIR, f), path.join(DOCS_DIR, f));
-  }
-  const adminHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'admin.html'), 'utf8')
-    .replace('href="/styles.css"', 'href="../styles.css"')
-    .replace('src="/admin.js"', 'src="admin.js"');
-  fs.writeFileSync(path.join(DOCS_DIR, 'admin', 'index.html'), adminHtml);
-  fs.copyFileSync(path.join(PUBLIC_DIR, 'admin.js'), path.join(DOCS_DIR, 'admin', 'admin.js'));
-  fs.writeFileSync(path.join(DOCS_DIR, '.nojekyll'), '');
-}
+const { buildDocs } = require('./scripts/build-docs');
 
 async function handleApi(req, res, pathname) {
   if (req.method === 'GET' && pathname === '/api/data') {
