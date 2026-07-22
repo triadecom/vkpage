@@ -11,7 +11,7 @@
       "Не размещаем: казино, финансовые пирамиды, 18+, политику.",
       "Бронь слота — после оплаты. Оплата на р/с ИП."
     ],
-    "updatedAt": "2026-07-21",
+    "updatedAt": "2026-07-22",
     "messageTemplate": "Здравствуйте! Пишу по поводу размещения рекламы в «{название}». Подскажите, пожалуйста, условия и свободные даты.",
     "sort": "manual",
     "offerUrl": "Oferta_WF.pdf",
@@ -34,8 +34,8 @@
       "avatar": "/avatars/6131bfdc1b132404.jpg",
       "url": "https://vk.com/pushkin_story",
       "category": "Город",
-      "subscribers": 82821,
-      "reach": 1609,
+      "subscribers": 82825,
+      "reach": 2089,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -55,8 +55,8 @@
       "avatar": "/avatars/98aa4463b0cf5995.jpg",
       "url": "https://vk.com/kupchinoask",
       "category": "Город",
-      "subscribers": 81986,
-      "reach": 1109,
+      "subscribers": 81987,
+      "reach": 1764,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -76,8 +76,8 @@
       "avatar": "/avatars/5488007a094cd583.jpg",
       "url": "https://vk.com/slavyanka",
       "category": "Город",
-      "subscribers": 60115,
-      "reach": 2177,
+      "subscribers": 60119,
+      "reach": 2911,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -98,7 +98,7 @@
       "url": "https://vk.com/kolpinoask",
       "category": "Город",
       "subscribers": 46190,
-      "reach": 483,
+      "reach": 679,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -118,8 +118,8 @@
       "avatar": "/avatars/3b00ccbc7c3e10a2.jpg",
       "url": "https://vk.com/gatchina_live",
       "category": "Город",
-      "subscribers": 42309,
-      "reach": 902,
+      "subscribers": 42307,
+      "reach": 991,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -139,8 +139,8 @@
       "avatar": "/avatars/429c1e665d2756d4.jpg",
       "url": "https://vk.com/districtmsk",
       "category": "Город",
-      "subscribers": 32953,
-      "reach": 439,
+      "subscribers": 32952,
+      "reach": 469,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -160,8 +160,8 @@
       "avatar": "/avatars/4a3dd4e8e12dc7ad.jpg",
       "url": "https://vk.com/shushary_story",
       "category": "Город",
-      "subscribers": 29826,
-      "reach": 473,
+      "subscribers": 29830,
+      "reach": 589,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -181,8 +181,8 @@
       "avatar": "/avatars/ebb572182bb4fb7f.jpg",
       "url": "https://vk.com/story_petergof",
       "category": "Город",
-      "subscribers": 26281,
-      "reach": 555,
+      "subscribers": 26282,
+      "reach": 609,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -203,7 +203,7 @@
       "url": "https://vk.com/slavyanka_news",
       "category": "Город",
       "subscribers": 23182,
-      "reach": 677,
+      "reach": 511,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -224,7 +224,7 @@
       "url": "https://vk.com/south_spb",
       "category": "Город",
       "subscribers": 21226,
-      "reach": 94,
+      "reach": 101,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -244,8 +244,8 @@
       "avatar": "/avatars/c6533dc1523b7585.jpg",
       "url": "https://vk.com/story_kingisepp",
       "category": "Город",
-      "subscribers": 20047,
-      "reach": 1067,
+      "subscribers": 20049,
+      "reach": 1110,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -265,8 +265,8 @@
       "avatar": "/avatars/b6b3bdd5fd4d3fec.jpg",
       "url": "https://vk.com/kommunar_online",
       "category": "Город",
-      "subscribers": 11386,
-      "reach": 405,
+      "subscribers": 11387,
+      "reach": 446,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -287,7 +287,7 @@
       "url": "https://vk.com/pushkin_family",
       "category": "Город",
       "subscribers": 8459,
-      "reach": 564,
+      "reach": 569,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -308,7 +308,7 @@
       "url": "https://vk.com/pulkovo_live",
       "category": "Город",
       "subscribers": 7950,
-      "reach": 83,
+      "reach": 103,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -329,7 +329,7 @@
       "url": "https://vk.com/story_sestroreck",
       "category": "Город",
       "subscribers": 6467,
-      "reach": 165,
+      "reach": 168,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -350,7 +350,7 @@
       "url": "https://vk.com/kronshtadt_story",
       "category": "Город",
       "subscribers": 5051,
-      "reach": 19,
+      "reach": 26,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -370,8 +370,8 @@
       "avatar": "/avatars/4a795af78f3f32f5.jpg",
       "url": "https://vk.com/spb_pn",
       "category": "Город",
-      "subscribers": 335071,
-      "reach": 430,
+      "subscribers": 335060,
+      "reach": 434,
       "reachManual": false,
       "note": "",
       "prices": [
