@@ -11,7 +11,7 @@
       "Не размещаем: казино, финансовые пирамиды, 18+, политику.",
       "Бронь слота — после оплаты. Оплата на р/с ИП."
     ],
-    "updatedAt": "2026-07-23",
+    "updatedAt": "2026-07-24",
     "messageTemplate": "Здравствуйте! Пишу по поводу размещения рекламы в «{название}». Подскажите, пожалуйста, условия и свободные даты.",
     "sort": "manual",
     "offerUrl": "Oferta_WF.pdf",
@@ -34,8 +34,8 @@
       "avatar": "/avatars/6131bfdc1b132404.jpg",
       "url": "https://vk.com/pushkin_story",
       "category": "Город",
-      "subscribers": 82849,
-      "reach": 1599,
+      "subscribers": 82854,
+      "reach": 2844,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -55,8 +55,8 @@
       "avatar": "/avatars/98aa4463b0cf5995.jpg",
       "url": "https://vk.com/kupchinoask",
       "category": "Город",
-      "subscribers": 81998,
-      "reach": 1162,
+      "subscribers": 81995,
+      "reach": 1590,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -76,8 +76,8 @@
       "avatar": "/avatars/5488007a094cd583.jpg",
       "url": "https://vk.com/slavyanka",
       "category": "Город",
-      "subscribers": 60124,
-      "reach": 2323,
+      "subscribers": 60125,
+      "reach": 2902,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -97,8 +97,8 @@
       "avatar": "/avatars/e5404d854f7078f5.jpg",
       "url": "https://vk.com/kolpinoask",
       "category": "Город",
-      "subscribers": 46209,
-      "reach": 750,
+      "subscribers": 46205,
+      "reach": 855,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -118,8 +118,8 @@
       "avatar": "/avatars/3b00ccbc7c3e10a2.jpg",
       "url": "https://vk.com/gatchina_live",
       "category": "Город",
-      "subscribers": 42325,
-      "reach": 694,
+      "subscribers": 42322,
+      "reach": 743,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -160,8 +160,8 @@
       "avatar": "/avatars/4a3dd4e8e12dc7ad.jpg",
       "url": "https://vk.com/shushary_story",
       "category": "Город",
-      "subscribers": 29838,
-      "reach": 549,
+      "subscribers": 29837,
+      "reach": 508,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -181,8 +181,8 @@
       "avatar": "/avatars/ebb572182bb4fb7f.jpg",
       "url": "https://vk.com/story_petergof",
       "category": "Город",
-      "subscribers": 26291,
-      "reach": 353,
+      "subscribers": 26293,
+      "reach": 466,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -203,7 +203,7 @@
       "url": "https://vk.com/slavyanka_news",
       "category": "Город",
       "subscribers": 23194,
-      "reach": 520,
+      "reach": 733,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -223,8 +223,8 @@
       "avatar": "/avatars/87285b10dbd272ac.jpg",
       "url": "https://vk.com/south_spb",
       "category": "Город",
-      "subscribers": 21225,
-      "reach": 77,
+      "subscribers": 21224,
+      "reach": 88,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -266,7 +266,7 @@
       "url": "https://vk.com/kommunar_online",
       "category": "Город",
       "subscribers": 11398,
-      "reach": 725,
+      "reach": 808,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -308,7 +308,7 @@
       "url": "https://vk.com/pulkovo_live",
       "category": "Город",
       "subscribers": 7950,
-      "reach": 104,
+      "reach": 110,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -350,7 +350,7 @@
       "url": "https://vk.com/kronshtadt_story",
       "category": "Город",
       "subscribers": 5050,
-      "reach": 37,
+      "reach": 41,
       "reachManual": false,
       "note": "",
       "prices": [
@@ -370,8 +370,8 @@
       "avatar": "/avatars/4a795af78f3f32f5.jpg",
       "url": "https://vk.com/spb_pn",
       "category": "Город",
-      "subscribers": 335033,
-      "reach": 461,
+      "subscribers": 335015,
+      "reach": 516,
       "reachManual": false,
       "note": "",
       "prices": [
