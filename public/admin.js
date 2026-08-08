@@ -1,14 +1,8 @@
 const $ = (sel) => document.querySelector(sel);
 
-// Режимы: локально (node server.js, вход по паролю) или с GitHub Pages —
-// тогда сохранение и обновление идут напрямую через GitHub API по токену.
-const REMOTE = location.hostname.endsWith('.github.io');
-const GH_REPO = REMOTE
-  ? location.hostname.split('.')[0] + '/' + location.pathname.split('/').filter(Boolean)[0]
-  : '';
-const GH_API = 'https://api.github.com/repos/' + GH_REPO;
-const TOKEN_KEY = REMOTE ? 'vkpage_gh_token' : 'vkpage_token';
-const storage = REMOTE ? localStorage : sessionStorage;
+// Админка работает через свой сервер: вход по паролю, сохранение сразу в живые данные.
+const TOKEN_KEY = 'vkpage_token';
+const storage = localStorage;
 
 let data = null;
 let token = storage.getItem(TOKEN_KEY) || '';
@@ -38,29 +32,9 @@ function plural(n, forms) {
   return forms[2];
 }
 
-// аватарки лежат рядом со страницей: /avatars локально, ../avatars относительно админки
+// аватарки сервер раздаёт из папки с данными
 function avatarSrc(avatar) {
-  return '../' + String(avatar).replace(/^\//, '');
-}
-
-function ghHeaders() {
-  return {
-    'Authorization': 'Bearer ' + token,
-    'Accept': 'application/vnd.github+json',
-    'Content-Type': 'application/json',
-  };
-}
-
-function b64utf8(str) {
-  const bytes = new TextEncoder().encode(str);
-  let bin = '';
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin);
-}
-
-function fromB64utf8(b64) {
-  const bin = atob(String(b64).replace(/\n/g, ''));
-  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+  return '/' + String(avatar).replace(/^\//, '');
 }
 
 function toast(message) {
@@ -94,17 +68,12 @@ function dropAuth(message) {
 function showLogin() {
   $('#login').hidden = false;
   $('#app').hidden = true;
-  if (REMOTE) {
-    $('#login-hint').textContent = 'Нужен GitHub-токен с правом записи в ' + GH_REPO + '. На компьютере админа его выдаёт команда: gh auth token';
-    $('#password-label').textContent = 'GitHub-токен';
-  }
   $('#password').focus();
 }
 
 function showApp() {
   $('#login').hidden = true;
   $('#app').hidden = false;
-  $('#publish').hidden = REMOTE; // в облаке сохранение само публикует
   renderSettings();
   renderPromos();
   renderPublics();
@@ -112,30 +81,6 @@ function showApp() {
 
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const value = $('#password').value.trim();
-
-  if (REMOTE) {
-    const res = await fetch(GH_API, {
-      headers: { 'Authorization': 'Bearer ' + value, 'Accept': 'application/vnd.github+json' },
-    });
-    const repo = res.ok ? await res.json() : null;
-    if (repo && repo.permissions && repo.permissions.push) {
-      token = value;
-      storage.setItem(TOKEN_KEY, token);
-      $('#login-error').textContent = '';
-      $('#password').value = '';
-      // перезагружаем данные уже с токеном — свежие и без анонимных лимитов
-      try {
-        data = await loadData();
-      } catch {
-        // оставляем то, что загрузилось при старте
-      }
-      showApp();
-    } else {
-      $('#login-error').textContent = 'Токен не подошёл — нужны права записи в ' + GH_REPO;
-    }
-    return;
-  }
 
   const res = await fetch('/api/login', {
     method: 'POST',
@@ -149,7 +94,8 @@ $('#login-form').addEventListener('submit', async (e) => {
     $('#password').value = '';
     showApp();
   } else {
-    $('#login-error').textContent = 'Неверный пароль';
+    const body = await res.json().catch(() => ({}));
+    $('#login-error').textContent = body.error || 'Неверный пароль';
   }
 });
 
@@ -311,120 +257,84 @@ $('#add-public').addEventListener('click', () => openEditor(null));
 
 /* ---------- Обновить всё из ВК ---------- */
 
+// Обход ВК делает сервер и сразу сохраняет результат — жать «Сохранить» не нужно
 $('#refresh-all').addEventListener('click', async () => {
   const button = $('#refresh-all');
 
-  if (REMOTE) {
-    // в облаке обновлением занимается GitHub Actions
-    button.disabled = true;
-    try {
-      if (await dispatchRefresh()) {
-        toast('Обновление запущено — результат появится здесь через 2–3 минуты');
-        watchForVkData();
-      } else if (token) {
-        toast('Не получилось запустить обновление');
-      }
-    } finally {
-      button.disabled = false;
-    }
+  if (dirty) {
+    toast('Сначала нажмите «Сохранить изменения» — иначе обновление их перезапишет');
     return;
   }
-
-  const targets = data.publics.filter((p) => p.url);
-  if (!targets.length) {
+  if (!data.publics.some((p) => p.url)) {
     toast('У сообществ не указаны ссылки на ВК');
     return;
   }
+
   button.disabled = true;
-  let done = 0;
-  let failed = 0;
-  for (const pub of targets) {
-    button.textContent = `Обновляю ${done + failed + 1}/${targets.length}…`;
-    try {
-      const res = await fetch('/api/vkinfo?url=' + encodeURIComponent(pub.url), {
-        headers: { 'Authorization': 'Bearer ' + token },
-      });
-      if (res.status === 401) {
-        dropAuth('Сессия истекла — войдите заново');
-        break;
-      }
-      const info = await res.json();
-      if (!res.ok) throw new Error();
-      if (info.name) pub.name = info.name;
-      if (info.avatar) pub.avatar = info.avatar;
-      if (info.subscribers) pub.subscribers = info.subscribers;
-      if (info.reach && !pub.reachManual) pub.reach = info.reach;
-      done++;
-    } catch {
-      failed++;
-    }
+  button.textContent = 'Обновляю из ВК…';
+  try {
+    const res = await fetch('/api/refresh', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (res.status === 401) return dropAuth('Сессия истекла — войдите заново');
+    if (!res.ok) throw new Error('Не получилось запустить обновление');
+    toast('Обхожу сообщества в ВК — это займёт около минуты');
+    const result = await waitForRefresh();
+    data = await loadData();
+    renderSettings();
+    renderPromos();
+    renderPublics();
+    markSaved();
+    if (result.error) toast('Обновление прервалось: ' + result.error);
+    else toast(result.failed
+      ? `Обновлено сообществ: ${result.updated}, не ответили: ${result.failed}`
+      : `Обновлено сообществ: ${result.updated} ✓`);
+  } catch (err) {
+    toast(err.message || 'Не получилось обновить');
+  } finally {
+    button.disabled = false;
+    button.textContent = '⟳ Обновить всё из ВК';
   }
-  button.disabled = false;
-  button.textContent = '⟳ Обновить всё из ВК';
-  if (done) markDirty();
-  renderPublics();
-  toast(failed
-    ? `Обновлено: ${done}, не получилось: ${failed}`
-    : `Обновлено: ${done} — не забудьте «Сохранить изменения»`);
 });
+
+// Сервер обходит ВК в фоне — ждём, пока освободится, но не дольше пяти минут
+function waitForRefresh() {
+  return new Promise((resolve, reject) => {
+    const startedAt = Date.now();
+    const timer = setInterval(async () => {
+      if (Date.now() - startedAt > 5 * 60 * 1000) {
+        clearInterval(timer);
+        reject(new Error('ВК отвечает слишком долго — загляните в админку через пару минут'));
+        return;
+      }
+      try {
+        const res = await fetch('/api/refresh-status', {
+          headers: { 'Authorization': 'Bearer ' + token },
+          cache: 'no-store',
+        });
+        if (!res.ok) return;
+        const state = await res.json();
+        if (!state.running) {
+          clearInterval(timer);
+          resolve(state);
+        }
+      } catch {
+        // сеть мигнула — спросим ещё раз на следующем тике
+      }
+    }, 3000);
+  });
+}
 
 /* ---------- Редактор сообщества ---------- */
 
-const VK_HINT = REMOTE
-  ? 'вставьте ссылку — название и цифры подтянутся (в облаке до минуты)'
-  : 'вставьте ссылку на паблик — данные подтянутся сами';
-
-async function dispatchRefresh() {
-  const res = await fetch(GH_API + '/actions/workflows/refresh.yml/dispatches', {
-    method: 'POST',
-    headers: ghHeaders(),
-    body: JSON.stringify({ ref: 'main' }),
-  });
-  if (res.status === 401 || res.status === 403) {
-    dropAuth('Токен не подошёл — войдите заново');
-    return false;
-  }
-  return res.status === 204;
-}
-
-// После облачного сохранения ждём, пока Actions заполнит данные из ВК,
-// и сами показываем результат — без перезагрузок и кнопок
-let watchTimer = null;
-function watchForVkData() {
-  clearInterval(watchTimer);
-  let tries = 0;
-  watchTimer = setInterval(async () => {
-    if (++tries > 15) {
-      clearInterval(watchTimer);
-      return;
-    }
-    try {
-      const res = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
-        headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
-        cache: 'no-store',
-      });
-      if (!res.ok) return;
-      const fresh = await res.json();
-      const stillWaiting = fresh.publics.some((p) => p.url && (!p.name || !p.subscribers));
-      if (!stillWaiting) {
-        clearInterval(watchTimer);
-        if (!dirty) {
-          data = fresh;
-          renderPublics();
-          toast('Данные из ВК подтянулись ✓');
-        }
-      }
-    } catch {
-      // временная ошибка сети — попробуем в следующий тик
-    }
-  }, 20000);
-}
+const VK_HINT = 'вставьте ссылку на паблик — данные подтянутся сами';
 
 function setVkStatus(text) {
   $('#vk-status').textContent = text;
 }
 
-async function updateAvatarPreview() {
+function updateAvatarPreview() {
   const img = $('#e-avatar');
   const placeholder = $('#e-avatar-placeholder');
   if (!editorAvatar) {
@@ -435,27 +345,7 @@ async function updateAvatarPreview() {
   }
   img.hidden = false;
   placeholder.hidden = true;
-  if (!REMOTE) {
-    img.src = avatarSrc(editorAvatar);
-    return;
-  }
-  // в облаке свежая аватарка появляется на сайте только после пересборки Pages,
-  // поэтому превью берём напрямую из репозитория через API
-  const current = editorAvatar;
-  try {
-    const res = await fetch(GH_API + '/contents/docs/' + current.replace(/^\//, '') + '?ref=main&ts=' + Date.now(), {
-      headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
-      cache: 'no-store',
-    });
-    if (current !== editorAvatar) return; // пока грузили, выбрали другую
-    if (res.ok) {
-      img.src = URL.createObjectURL(await res.blob());
-      return;
-    }
-  } catch {
-    // сеть мигнула — покажем через сайт
-  }
-  if (current === editorAvatar) img.src = avatarSrc(current);
+  img.src = avatarSrc(editorAvatar);
 }
 
 function addPriceRow(format = '', price = '') {
@@ -520,7 +410,7 @@ function fillEditorFromInfo(info, url) {
   setVkStatus('Данные из ВК загружены ✓');
 }
 
-// Локальный режим: сервер сходит в ВК сам, мгновенно
+// В ВК ходит сервер — браузеру туда нельзя из-за CORS
 async function fetchFromVk() {
   const url = $('#e-url').value.trim();
   if (!url || url === lastFetchedUrl) return;
@@ -542,77 +432,9 @@ async function fetchFromVk() {
   }
 }
 
-/* Облачный режим: браузеру к ВК нельзя (CORS), поэтому данные добывает
-   workflow vkinfo — кладёт их в docs/vkinfo/<hash>.json, а редактор забирает */
-
-async function sha1hex16(str) {
-  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
-}
-
-async function readVkInfoFile(hash) {
-  const res = await fetch(GH_API + '/contents/docs/vkinfo/' + hash + '.json?ref=main&ts=' + Date.now(), {
-    headers: { 'Accept': 'application/vnd.github.raw+json', 'Authorization': 'Bearer ' + token },
-    cache: 'no-store',
-  });
-  if (!res.ok) return null;
-  try {
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
-let remoteFetchSeq = 0;
-
-async function remoteFetchFromVk() {
-  const url = $('#e-url').value.trim();
-  if (!url || url === lastFetchedUrl) return;
-  const seq = ++remoteFetchSeq;
-  const hash = await sha1hex16(url);
-
-  // недавний результат уже лежит в репозитории — заполняем мгновенно
-  const cached = await readVkInfoFile(hash);
-  if (cached && Date.now() - Date.parse(cached.fetchedAt) < 24 * 3600 * 1000) {
-    if (seq === remoteFetchSeq) fillEditorFromInfo(cached, url);
-    return;
-  }
-
-  setVkStatus('Запрашиваю данные из ВК — обычно до минуты…');
-  const res = await fetch(GH_API + '/actions/workflows/vkinfo.yml/dispatches', {
-    method: 'POST',
-    headers: ghHeaders(),
-    body: JSON.stringify({ ref: 'main', inputs: { url } }),
-  });
-  if (res.status === 401 || res.status === 403) return dropAuth('Токен не подошёл — войдите заново');
-  if (res.status !== 204) {
-    setVkStatus('Не получилось запустить загрузку — попробуйте ещё раз');
-    return;
-  }
-
-  const startedAt = Date.now();
-  const poll = setInterval(async () => {
-    if (seq !== remoteFetchSeq || $('#modal-backdrop').hidden) {
-      clearInterval(poll);
-      return;
-    }
-    if (Date.now() - startedAt > 3 * 60 * 1000) {
-      clearInterval(poll);
-      setVkStatus('ВК не ответил — попробуйте ещё раз или сохраните, облако дозаполнит');
-      return;
-    }
-    const info = await readVkInfoFile(hash);
-    if (info && Date.parse(info.fetchedAt) >= startedAt - 60 * 1000) {
-      clearInterval(poll);
-      fillEditorFromInfo(info, url);
-    }
-  }, 10000);
-}
-
 $('#fetch-vk').addEventListener('click', () => {
   lastFetchedUrl = ''; // кнопка — явный запрос, перезагружаем даже для того же адреса
-  if (REMOTE) remoteFetchFromVk();
-  else fetchFromVk();
+  fetchFromVk();
 });
 
 // Автоподтягивание: вставил ссылку — данные поехали сами
@@ -620,7 +442,7 @@ $('#e-url').addEventListener('input', () => {
   clearTimeout(autoFetchTimer);
   const url = $('#e-url').value.trim();
   if (!/(^|\/\/)(www\.|m\.)?vk\.com\/[\w.\-]+/i.test(url)) return;
-  autoFetchTimer = setTimeout(() => (REMOTE ? remoteFetchFromVk() : fetchFromVk()), 700);
+  autoFetchTimer = setTimeout(fetchFromVk, 700);
 });
 
 $('#add-price').addEventListener('click', () => addPriceRow());
@@ -663,66 +485,7 @@ $('#editor').addEventListener('submit', (e) => {
 
 /* ---------- Сохранение ---------- */
 
-async function saveRemote() {
-  data.settings.updatedAt = new Date().toISOString().slice(0, 10);
-
-  const getRes = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
-    headers: ghHeaders(),
-    cache: 'no-store',
-  });
-  if (getRes.status === 401 || getRes.status === 403) return 'auth';
-  let sha;
-  if (getRes.ok) {
-    const file = await getRes.json();
-    sha = file.sha;
-    // сливаем со свежими настройками из репозитория: поля, о которых эта
-    // версия админки не знает, не должны затираться при сохранении
-    try {
-      const fresh = JSON.parse(fromB64utf8(file.content));
-      data.settings = { ...fresh.settings, ...data.settings };
-    } catch {
-      // не удалось разобрать — сохраняем как есть
-    }
-  }
-  const body = JSON.stringify(data, null, 2) + '\n';
-
-  const putRes = await fetch(GH_API + '/contents/docs/data.json', {
-    method: 'PUT',
-    headers: ghHeaders(),
-    body: JSON.stringify({
-      message: 'Обновление прайса из админки',
-      content: b64utf8(body),
-      sha,
-      branch: 'main',
-    }),
-  });
-  if (putRes.status === 401 || putRes.status === 403) return 'auth';
-  if (putRes.status === 409) return 'conflict';
-  return putRes.ok ? 'ok' : 'error';
-}
-
 $('#save').addEventListener('click', async () => {
-  if (REMOTE) {
-    const result = await saveRemote();
-    if (result === 'auth') return dropAuth('Токен не подошёл — войдите заново');
-    if (result === 'ok') {
-      markSaved();
-      // у новых пабликов есть ссылка, но нет данных — облако заполнит их само
-      const needsVk = data.publics.some((p) => p.url && (!p.name || !p.avatar || !p.subscribers));
-      if (needsVk && await dispatchRefresh()) {
-        toast('Сохранено — название и цифры подтянутся из ВК через пару минут');
-        watchForVkData();
-      } else {
-        toast('Сохранено — сайт обновится через минуту-две');
-      }
-    } else if (result === 'conflict') {
-      toast('Конфликт версий — перезагрузите админку и повторите');
-    } else {
-      toast('Не удалось сохранить — попробуйте ещё раз');
-    }
-    return;
-  }
-
   const res = await fetch('/api/data', {
     method: 'PUT',
     headers: {
@@ -739,37 +502,9 @@ $('#save').addEventListener('click', async () => {
     const result = await res.json();
     data.settings.updatedAt = result.updatedAt;
     markSaved();
-    toast('Сохранено ✓');
+    toast('Сохранено ✓ — страница уже обновилась');
   } else {
     toast('Не удалось сохранить — попробуйте ещё раз');
-  }
-});
-
-$('#publish').addEventListener('click', async () => {
-  if (dirty) {
-    toast('Сначала нажмите «Сохранить изменения»');
-    return;
-  }
-  const button = $('#publish');
-  button.disabled = true;
-  button.textContent = 'Публикую…';
-  try {
-    const res = await fetch('/api/publish', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + token },
-    });
-    if (res.status === 401) {
-      dropAuth('Сессия истекла — войдите заново');
-      return;
-    }
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'Не получилось опубликовать');
-    toast('Опубликовано! Страница в интернете обновится через минуту');
-  } catch (err) {
-    toast(err.message || 'Не получилось опубликовать');
-  } finally {
-    button.disabled = false;
-    button.textContent = 'Опубликовать';
   }
 });
 
@@ -780,27 +515,7 @@ window.addEventListener('beforeunload', (e) => {
 /* ---------- Старт ---------- */
 
 async function loadData() {
-  if (!REMOTE) {
-    return (await fetch('/api/data')).json();
-  }
-  // основной источник — GitHub API (всегда свежий); у анонимных запросов
-  // жёсткий лимит на IP, поэтому при неудаче берём копию с самого сайта
-  try {
-    const res = await fetch(GH_API + '/contents/docs/data.json?ref=main&ts=' + Date.now(), {
-      headers: {
-        'Accept': 'application/vnd.github.raw+json',
-        ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
-      },
-      cache: 'no-store',
-    });
-    if (res.ok) {
-      const parsed = await res.json();
-      if (parsed && parsed.settings) return parsed;
-    }
-  } catch {
-    // сеть или лимит — переходим на запасной источник
-  }
-  const res = await fetch('../data.json?ts=' + Date.now(), { cache: 'no-store' });
+  const res = await fetch('/api/data', { cache: 'no-store' });
   const parsed = await res.json();
   if (!parsed || !parsed.settings) throw new Error('данные не читаются');
   return parsed;

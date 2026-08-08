@@ -66,7 +66,7 @@ function renderCard(pub, settings) {
   const initial = String(pub.name || '?').trim().charAt(0).toUpperCase() || '?';
   // путь относительный, чтобы работало и локально, и на GitHub Pages в поддиректории
   const cover = pub.avatar
-    ? `<img class="card-cover-img" src="${esc(String(pub.avatar).replace(/^\//, ''))}" alt="" loading="lazy">`
+    ? `<img class="card-cover-img" src="/${esc(String(pub.avatar).replace(/^\//, ''))}" alt="" loading="lazy">`
     : `<span class="card-cover-ph">${esc(initial)}</span>`;
 
   return `
@@ -250,7 +250,7 @@ $('#publics').addEventListener('click', (e) => {
     .catch(() => {});
 });
 
-fetch('data.json')
+fetch('/data.json', { cache: 'no-cache' })
   .then((res) => res.json())
   .then(render)
   .catch(() => {

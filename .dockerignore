@@ -1,0 +1,7 @@
+.git
+.github
+.DS_Store
+config.json
+*.tmp
+node_modules
+README.md
